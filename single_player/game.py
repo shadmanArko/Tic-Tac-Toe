@@ -26,6 +26,14 @@ def GetSymbolFromUser() -> str:
         print("Please type X or O.")
 
 
+def ask_name(default_label: str) -> str:
+    """Ask a player for a display name; fall back to `default_label`
+    (e.g. 'Player 1') if they just press Enter instead of typing one.
+    """
+    raw = input(f"{default_label}, enter your name (or press Enter to use '{default_label}'): ").strip()
+    return raw if raw else default_label
+
+
 def ask_for_move(player_label: str, board: Board) -> int:
 
     while True:
@@ -48,21 +56,23 @@ def play_game() -> None:
     """Run one full game from empty board to a decided result."""
     board = Board()
 
+    player1_name = ask_name("Player 1")
     player1_symbol = GetSymbolFromUser()
     player2_symbol = other_symbol(player1_symbol)
+    player2_name = ask_name("Player 2")
     # 'X' always moves first, regardless of which human asked to be
     # 'X' or 'O' — a fixed rule beats an implicit "whoever we asked
     # first" rule, which breaks down as soon as turn order matters.
     label_for_symbol = {
-        player1_symbol: "Player 1",
-        player2_symbol: "Player 2",
+        player1_symbol: f"{player1_name} ({player1_symbol})",
+        player2_symbol: f"{player2_name} ({player2_symbol})",
     }
     current_symbol = "X"
     result: str | None = None
 
     while result is None:
         print("\n" + board.render() + "\n")
-        current_label = f"{label_for_symbol[current_symbol]} ({current_symbol})"
+        current_label = label_for_symbol[current_symbol]
         position = ask_for_move(current_label, board)
         board.make_move(position, current_symbol)
         result = board.check_winner()
@@ -73,7 +83,7 @@ def play_game() -> None:
     if result == "draw":
         print("It's a draw!")
     else:
-        print(f"{label_for_symbol[result]} ({result}) wins!")
+        print(f"{label_for_symbol[result]} wins!")
 
 
 
